@@ -245,7 +245,7 @@ bool RollAction::Execute(Event event)
     }
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
-        
+    
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
     switch (proto->Class)
     {
@@ -253,7 +253,142 @@ bool RollAction::Execute(Event event)
         case ITEM_CLASS_ARMOR:
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         {
-            bot->DoRandomRoll(0,100);
+            // We don't want to actually roll anymore, we want an upgrade based system where Bots link current gear
+            //bot->DoRandomRoll(0,100);
+
+            // If the item is in a set, get the number of total items in the set and the number of items the bot currently has equipped
+            uint32 setid = proto->ItemSet;
+            uint32 totalSetItems = 0;
+            uint32 currentSetItems = 0;
+            ItemSetEntry const* set = sItemSetStore.LookupEntry(setid);
+            if (set)
+            {
+                // Get total number of items in the set
+                for (int i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
+                {
+                    if (set->itemId[i] != 0)
+                    {
+                        totalSetItems++;
+                    }
+                }
+
+                // Get number of currently equipped items
+                for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
+                {
+                    Item* tempItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                    if (tempItem)
+                    {
+                        if (tempItem->GetTemplate()->ItemSet == setid)
+                            currentSetItems++;
+                    }
+                }
+            }
+
+            // When rolling for an item, also link the item being upgraded
+            uint8 invType = proto->InventoryType;
+            if (invType == INVTYPE_RANGED || invType == INVTYPE_THROWN || invType == INVTYPE_RANGEDRIGHT)
+            {
+                Item* currentRanged = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+                if (currentRanged != NULL)
+                {
+                    std::ostringstream out;
+                    out << "current item " << chat->FormatItem(currentRanged->GetTemplate()) << " in ranged slot";
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+                else
+                {
+                    std::ostringstream out;
+                    out << "No item currently equipped ";
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+            }
+
+            // Handle weapon
+            bool isWeapon = (proto->Class == ITEM_CLASS_WEAPON);
+            if (isWeapon)
+            {
+                Item* mainHandItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                Item* offHandItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+
+                if (mainHandItem != NULL || offHandItem != NULL)
+                {
+                    std::ostringstream out;
+                    out << "current item ";
+                    if (mainHandItem != NULL)
+                        out << " MH " << chat->FormatItem(mainHandItem->GetTemplate());
+                    if (offHandItem != NULL)
+                        out << " OH " << chat->FormatItem(offHandItem->GetTemplate());
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+                else
+                {
+                    std::ostringstream out;
+                    out << "No item currently equipped ";
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+            }
+
+            // Handle ring and trinket by linking both
+            uint8 dstSlot = botAI->FindEquipSlot(proto, NULL_SLOT, true);
+            if (dstSlot == EQUIPMENT_SLOT_FINGER1 || dstSlot == EQUIPMENT_SLOT_TRINKET1)
+            {
+                Item* first = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot);
+                Item* second = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot + 1);
+
+                if (first != NULL || second != NULL)
+                {
+                    std::ostringstream out;
+                    out << "current item ";
+                    if (first != NULL)
+                        out << " " << chat->FormatItem(first->GetTemplate());
+                    if (second != NULL)
+                        out << " " << chat->FormatItem(second->GetTemplate());
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+                else
+                {
+                    std::ostringstream out;
+                    out << "No item currently equipped ";
+                    if (set && currentSetItems > 0)
+                        out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                    botAI->TellMaster(out);
+                    return true;
+                }
+            }
+
+            // Handle everything else
+            Item* currentlyEquipped = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot);
+            if (currentlyEquipped != NULL)
+            {
+                std::ostringstream out;
+                out << "current item " << chat->FormatItem(currentlyEquipped->GetTemplate());
+                if (set && currentSetItems > 0)
+                    out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                botAI->TellMaster(out);
+            }
+            else
+            {
+                std::ostringstream out;
+                out << "No item currently equipped ";
+                if (set && currentSetItems > 0)
+                    out << " [Set Items (" << currentSetItems << "/" << totalSetItems << ")]";
+                botAI->TellMaster(out);
+            }
         }
     }
     return true;
