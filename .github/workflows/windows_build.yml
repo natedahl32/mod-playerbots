@@ -1,9 +1,9 @@
 name: windows-build
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "test-staging" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "test-staging" ]
 
 concurrency:
   group: "windows-build-${{ github.event.pull_request.number }}"
@@ -23,23 +23,27 @@ jobs:
       - name: Checkout AzerothCore
         uses: actions/checkout@v3
         with:
-          repository: 'liyunfan1223/azerothcore-wotlk'
+          repository: 'mod-playerbots/azerothcore-wotlk'
           ref: 'Playerbot'
+          path: 'ac'
       - name: Checkout Playerbot Module
         uses: actions/checkout@v3
         with:
-          repository: 'liyunfan1223/mod-playerbots'
-          path: 'modules/mod-playerbots'
+          repository: 'mod-playerbots/mod-playerbots'
+          #path: 'modules/mod-playerbots'
+          path: ac/modules/mod-playerbots
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
       - name: Configure OS
         shell: bash
+        working-directory: ac
         env:
           CONTINUOUS_INTEGRATION: true
         run: |
           ./acore.sh install-deps
       - name: Build
         shell: bash
+        working-directory: ac
         run: |
           export CTOOLS_BUILD=all
           ./acore.sh compiler build

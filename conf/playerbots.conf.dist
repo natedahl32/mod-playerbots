@@ -3,9 +3,10 @@
 ##################################################
 
 # Overview
-# "Randombot": randomly generated bots that log in separately from players and populate the world. Depending on settings, randombots may automatically grind, quest, and upgrade equipment and can be invited to groups and given commands.
-# "Altbot": characters created on player accounts, which may be logged in by the player and invited to groups and given commands like randombots. Depending on settings, altbots can be limited to characters on the active player's account or in the active player's guild.
-# Information about commands to control bots and set their strategies can be found on the wiki at https://github.com/liyunfan1223/mod-playerbots/wiki/Playerbot-Commands.
+# "Randombot": randomly generated bots that log in separately from players and populate the world. Randombots may automatically grind, quest, level up, and upgrade equipment and can be invited to groups and given commands.
+# "AddClass bot": bots from the AddClassAccountPoolSize accounts. They are used for quickly adding a leveled and geared bot of any class to your party. They are recommended for a quick formation of a party.
+# "Altbot": characters created on player accounts, which may be logged in by the player and invited to groups and given commands like randombots. They are best suited for long-progression playthroughs.
+# Information about commands to control bots and set their strategies can be found on the wiki at https://github.com/mod-playerbots/mod-playerbots/wiki/Playerbot-Commands.
 
 ####################################################################################################
 # SECTION INDEX
@@ -21,9 +22,11 @@
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
+#        GREATER BUFFS STRATEGIES
 #        CHEATS
 #        SPELLS
 #        FLIGHTPATH
+#        PROFESSIONS
 #    RANDOMBOT-SPECIFIC SETTINGS
 #        GENERAL
 #        LEVELS
@@ -35,7 +38,7 @@
 #        RPG STRATEGY
 #        TELEPORTS
 #        BATTLEGROUND & ARENA & PVP
-#        INTERVALS
+#        RANDOM BOT TIMING AND BEHAVIOR
 #    PREMADE SPECS
 #        INFORMATION
 #        WARRIOR
@@ -43,7 +46,7 @@
 #        HUNTER
 #        ROGUE
 #        PRIEST
-#        DEATHKNIGHT
+#        DEATH KNIGHT
 #        SHAMAN
 #        MAGE
 #        WARLOCK
@@ -54,7 +57,7 @@
 #        HUNTER
 #        ROGUE
 #        PRIEST
-#        DEATHKNIGHT
+#        DEATH KNIGHT
 #        SHAMAN
 #        MAGE
 #        WARLOCK
@@ -89,17 +92,20 @@ AiPlayerbot.MinRandomBots = 500
 AiPlayerbot.MaxRandomBots = 500
 
 # Randombot accounts
-# If you are not using any expansion at all, you may have to set this manually, in which case please ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
+# If you are not using any expansion at all, you may have to set this manually, in which case please
+# ensure that RandomBotAccountCount is at least greater than (MaxRandomBots / 10 + AddClassAccountPoolSize)
 # Default: 0 (automatic)
 AiPlayerbot.RandomBotAccountCount = 0
 
 # Delete all randombot accounts
-# To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would like to recreate randombots, set the number back to 0 and rerun the Worldserver.
+# To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would
+# like to recreate randombots, set the number back to 0 and rerun the Worldserver.
 AiPlayerbot.DeleteRandomBotAccounts = 0
 
 # Disable randombots when no real players are logged in
 # Default: 0 (randombots will login when server starts)
-# If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will log out 300 seconds (default) after all real players log out
+# If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will
+# log out 300 seconds (default) after all real players log out
 AiPlayerbot.DisabledWithoutRealPlayer = 0
 AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
 AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
@@ -151,12 +157,16 @@ AiPlayerbot.AllowGuildBots = 1
 AiPlayerbot.AllowTrustedAccountBots = 1
 
 # Randombots will create guilds with nearby randombots
-# Note: currently, randombots will not invite more bots after a guild is created (i.e., randombot guilds will have only the 10 initial randombots needed to sign the charter)
+# Note: currently, randombots will not invite more bots after a guild is created,
+# meaning randombot guilds will have only the 10 initial randombots needed to sign the charter
 # Default: 0 (disabled)
 AiPlayerbot.RandomBotGuildNearby = 0
 
 # Number of guilds created by randombots
 AiPlayerbot.RandomBotGuildCount = 20
+
+# Maximum number of members in randombot guilds (minimum is hardcoded to 10)
+AiPlayerbot.RandomBotGuildSizeMax = 15
 
 # Delete all randombot guilds if set to 1
 AiPlayerbot.DeleteRandomBotGuilds = 0
@@ -174,10 +184,6 @@ AiPlayerbot.SummonWhenGroup = 1
 # Selfbot permission level (0 = disabled, 1 = GM only (default), 2 = all players, 3 = activate on login)
 AiPlayerbot.SelfBotLevel = 1
 
-# Give free food to bots
-# Default: 1 (enabled)
-AiPlayerbot.FreeFood = 1
-
 # Non-GM player can only use init=auto to initialize bots based on their own level and gearscore
 # Default: 0 (non-GM player can use any intialization commands)
 AiPlayerbot.AutoInitOnly = 0
@@ -186,7 +192,8 @@ AiPlayerbot.AutoInitOnly = 0
 # Default: 1.0 (same with the player)
 AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
 
-# Bot automatically trains spells when talking to trainer (yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells)
+# Bot automatically trains spells when talking to trainer
+# yes = train all available spells as long as the bot has the money, free = auto trains with no money cost, no = only list spells
 AiPlayerbot.AutoTrainSpells = yes
 
 #
@@ -263,7 +270,7 @@ AiPlayerbot.UseFastFlyMountAtMinLevel = 70
 AiPlayerbot.RandomBotShowHelmet = 1
 AiPlayerbot.RandomBotShowCloak = 1
 
-# Randombots and altbots automatically equip upgrades (bots will equip any item obtained from looting or a quest if they are sufficient upgrades)
+# Toggles whether altbots will automatically equip items in their inventory that are sufficient upgrades
 # Default: 1 (enabled)
 AiPlayerbot.AutoEquipUpgradeLoot = 1
 
@@ -283,9 +290,6 @@ AiPlayerbot.TwoRoundsGearInit = 0
 # LOOTING
 #
 #
-
-# Bots will say information about items when collecting them
-AiPlayerbot.SayWhenCollectingItems = 1
 
 # Bots keep looting when loot system is set to free for all
 # Default: 0 (disabled)
@@ -314,7 +318,8 @@ AiPlayerbot.GlobalCooldown = 500
 # Max wait time when moving
 AiPlayerbot.MaxWaitForMove = 5000
 
-# Disable use of MoveSplinePath for bot movement, will result in more erratic bot movement but means stun/snare/root/etc will work on bots (they wont reliably work when MoveSplinePath is enabled, though slowing effects still work ok)
+# Enable/disable use of MoveSplinePath for bot movement
+# Disabling will result in more erratic movement but is required for stuns, snares, and roots to work on bots
 # Default: 0 - MoveSplinePath enabled
 #          1 - MoveSplinePath disabled in BG/Arena only
 #          2 - MoveSplinePath disabled everywhere
@@ -360,15 +365,15 @@ AiPlayerbot.LootDelay = 1000
 #
 #
 
+# Distances are in yards
 AiPlayerbot.FarDistance = 20.0
-AiPlayerbot.SightDistance = 75.0
+AiPlayerbot.SightDistance = 100.0
 AiPlayerbot.SpellDistance = 28.5
 AiPlayerbot.ShootDistance = 5.0
-AiPlayerbot.ReactDistance = 150.0
-AiPlayerbot.GrindDistance = 75.0
 AiPlayerbot.HealDistance = 38.5
 AiPlayerbot.LootDistance = 15.0
 AiPlayerbot.FleeDistance = 5.0
+AiPlayerbot.AggroDistance = 22
 AiPlayerbot.TooCloseDistance = 5.0
 AiPlayerbot.MeleeDistance = 0.75
 AiPlayerbot.FollowDistance = 1.5
@@ -376,7 +381,8 @@ AiPlayerbot.WhisperDistance = 6000.0
 AiPlayerbot.ContactDistance = 0.45
 AiPlayerbot.AoeRadius = 10
 AiPlayerbot.RpgDistance = 200
-AiPlayerbot.AggroDistance = 22
+AiPlayerbot.GrindDistance = 75.0
+AiPlayerbot.ReactDistance = 150.0
 
 #
 #
@@ -407,10 +413,11 @@ AiPlayerbot.HighMana = 65
 #
 #
 
-# Bots pick their quest rewards (yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple)
+# Bots pick their quest rewards
+# yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple
 AiPlayerbot.AutoPickReward = yes
 
-# Sync quests with player (Bots will complete quests the moment you hand them in and will not loot quest items.)
+# Sync quests with player (bots will complete quests the moment you hand them in and will not loot quest items.)
 # Default: 1 (enabled)
 AiPlayerbot.SyncQuestWithPlayer = 1
 
@@ -435,7 +442,7 @@ AiPlayerbot.DropObsoleteQuests = 1
 # Auto add dungeon/raid strategies when entering the instance if implemented
 AiPlayerbot.ApplyInstanceStrategies = 1
 
-# Enable auto avoid aoe strategy (experimental)
+# Enable auto avoid aoe strategy
 # Default: 1 (enabled)
 AiPlayerbot.AutoAvoidAoe = 1
 
@@ -443,7 +450,7 @@ AiPlayerbot.AutoAvoidAoe = 1
 AiPlayerbot.MaxAoeAvoidRadius = 15.0
 
 # A whitelist of aoe spell IDs that should not be avoided
-AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
 
 # Enable healer bot save mana strategy
 # Default: 1 (enabled)
@@ -462,15 +469,64 @@ AiPlayerbot.FleeingEnabled = 1
 ####################################################################################################
 
 ####################################################################################################
+# GREATER BUFFS STRATEGIES
+#
+#
+
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
 # CHEATS
 #
 #
 
-# Enable/Disable maintenance command (learn all available spells and skills, supplement consumables, repair, enchant equipment if bot's level is above AiPlayerbot.MinEnchantingBotLevel)
+# Enable/Disable maintenance command
+# Learn all available spells and skills, assign talent points, refresh consumables, repair, enchant equipment, socket gems, etc.
+# Applies if bot's level is above AiPlayerbot.MinEnchantingBotLevel
 # Default: 1 (enabled)
 AiPlayerbot.MaintenanceCommand = 1
 
-# Enable/Disable autogear command, which automatically upgrades bots' gear; the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
+# Enable/Disable specific maintenance command functionality for alt bots
+# Disable to prevent players from giving free bags, spells, skill levels, etc. to their alt bots
+# Default: 1 (enabled)
+AiPlayerbot.AltMaintenanceAmmo = 1
+AiPlayerbot.AltMaintenanceFood = 1
+AiPlayerbot.AltMaintenanceReagents = 1
+AiPlayerbot.AltMaintenanceConsumables = 1
+AiPlayerbot.AltMaintenancePotions = 1
+
+AiPlayerbot.AltMaintenanceBags = 1
+AiPlayerbot.AltMaintenanceMounts = 1
+AiPlayerbot.AltMaintenanceSkills = 1
+
+# "Special Spells" consist of any spells listed in AiPlayerbot.RandomBotSpellIds and Death Gate for Death Knights
+AiPlayerbot.AltMaintenanceClassSpells = 1
+AiPlayerbot.AltMaintenanceAvailableSpells = 1
+AiPlayerbot.AltMaintenanceSpecialSpells = 1
+AiPlayerbot.AltMaintenanceTalentTree = 1
+AiPlayerbot.AltMaintenanceGlyphs = 1
+AiPlayerbot.AltMaintenanceGemsEnchants = 1
+
+AiPlayerbot.AltMaintenancePet = 1
+AiPlayerbot.AltMaintenancePetTalents = 1
+
+AiPlayerbot.AltMaintenanceReputation = 1
+AiPlayerbot.AltMaintenanceAttunementQuests = 1
+AiPlayerbot.AltMaintenanceKeyring = 1
+
+# Enable/Disable autogear command, which automatically upgrades bots' gear
+# The quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
 # Default: 1 (enabled)
 AiPlayerbot.AutoGearCommand = 1
 
@@ -488,23 +544,24 @@ AiPlayerbot.AutoGearQualityLimit = 3
 # Max iLVL Phase 1(MC, Ony, ZG) = 78 | Phase 2(BWL) = 83 | Phase 2.5(AQ40) = 88 | Phase 3(Naxx40) = 92
 # TBC
 # Max iLVL Tier 4 = 120 | Tier 5 = 133 | Tier 6 = 164
-# Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 1.5(ZA) = 138 | Phase 2(SC, TK) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
-# Wotlk
+# Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 2(SSC, TK, ZA) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
+# WotLK
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
-# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290 
+# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
+# "food" (bots eat or drink without using food or drinks from their inventory)
 # "gold" (bots have infinite gold)
-# "health" (bots have infinite health)
+# "health" (bots immediately regenerate lost health)
 # "mana" (bots have infinite mana)
 # "power" (bots have infinite energy, rage, and runic power)
-# "taxi" (bots may use all flight paths, though they will not actually learn them) 
-# "raid" (bots use cheats implemented into raid strategies) 
+# "taxi" (bots may use all flight paths, though they will not actually learn them)
+# "raid" (bots use cheats implemented into raid strategies (currently only for SSC and Ulduar))
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
-# Default: taxi and raid are enabled
-AiPlayerbot.BotCheats = "taxi,raid" 
+# Default: food, taxi, and raid are enabled
+AiPlayerbot.BotCheats = "food,taxi,raid"
 
 #
 #
@@ -527,6 +584,30 @@ AiPlayerbot.BotTaxiGapMs = 200
 
 # Extra small randomness added to each gap so launches don’t look robotic (ms)
 AiPlayerbot.BotTaxiGapJitterMs = 100
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
+# PROFESSIONS
+# Note: Random bots currently do not get professions
+#
+
+# Automatically adds the 'master fishing' strategy to bots that have the fishing skill when the bots master fishes.
+# Default: 1 (Enabled)
+AiPlayerbot.EnableFishingWithMaster = 1
+
+# Distance from itself (in yards) that a bot with a master will search for water to fish
+AiPlayerbot.FishingDistanceFromMaster = 10.0
+
+# Distance from itself (in yards) that a bot without a master will search for water to fish
+# Currently not relevant since masterless bots will not fish
+AiPlayerbot.FishingDistance = 40.0
+
+# Distance from water (in yards) beyond which a bot will remove the 'master fishing' strategy
+AiPlayerbot.EndFishingWithMaster = 30.0
 
 #
 #
@@ -559,9 +640,11 @@ AiPlayerbot.RandomBotMaxLevel = 80
 AiPlayerbot.SyncLevelWithPlayers = 0
 
 # Mark many quests ≤ bot level as complete (slows down bot creation)
+# Default: 0 (disabled)
 AiPlayerbot.PreQuests = 0
 
 # Enable LFG for randombots
+# Default: 1 (enabled)
 AiPlayerbot.RandomBotJoinLfg = 1
 
 # Enable/Disable periodic online - offline of randombots to mimic the real-world scenario where not all players are online simultaneously
@@ -582,11 +665,12 @@ AiPlayerbot.RandomBotHordeRatio = 50
 AiPlayerbot.DisableDeathKnightLogin = 0
 
 # Enable simulated expansion limitation for talents and glyphs
-# If enabled, limits talent trees to 5 rows plus the middle talent of the 6th row for bots until level 61 and 7 rows plus the middle talent of the 8th row for bots until level 71
+# If enabled, limits talent trees to 5 rows plus the middle talent of the 6th row for bots until level 61
+# and 7 rows plus the middle talent of the 8th row for bots from level 61 until level 71
 # Default: 0 (disabled)
 AiPlayerbot.LimitTalentsExpansion = 0
 
-# Configure randombots and addClass bot trading (0: Disabled, 1: Enabled, 2: Only Buy, 3: Only Sell)
+# Configure randombot trading (0: Disabled, 1: Enabled, 2: Only Buy, 3: Only Sell)
 # Default: 1 (enabled)
 AiPlayerbot.EnableRandomBotTrading = 1
 
@@ -651,10 +735,10 @@ AiPlayerbot.RandomGearQualityLimit = 3
 # Max iLVL Phase 1(MC, Ony, ZG) = 78 | Phase 2(BWL) = 83 | Phase 2.5(AQ40) = 88 | Phase 3(Naxx40) = 92
 # TBC
 # Max iLVL Tier 4 = 120 | Tier 5 = 133 | Tier 6 = 164
-# Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 1.5(ZA) = 138 | Phase 2(SC, TK) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
-# Wotlk
+# Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 2(SSC, TK, ZA) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
+# WotLK
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
-# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290 
+# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
 AiPlayerbot.RandomGearScoreLimit = 0
 
@@ -662,12 +746,13 @@ AiPlayerbot.RandomGearScoreLimit = 0
 # Default: 1 (enabled)
 AiPlayerbot.IncrementalGearInit = 1
 
-# Set minimum level of bots that will enchant their equipment (Maxlevel + 1 to disable)
+# Set minimum level of bots that will enchant and socket gems into their equipment with maintenance
+# If greater than RandomBotMaxlevel, bots will not automatically enchant equipment or socket gems
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
-# Enable expansion limitation for bot enchants
-# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants until level 71
+# Enable expansion limitation for bot enchants and gems
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants and gems until level 71
 # Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
@@ -763,7 +848,7 @@ AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 #
 
 # Quest that will be completed and rewarded for all randombots
-AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761,10277,10285,11492,24499,24511,24710,24712"
+AiPlayerbot.RandomBotQuestIds = "3802,5505,6502,7761,7848,10277,10285,11492,13188,13189,24499,24511,24710,24712"
 
 # Randombots will group with nearby randombots to do shared quests
 AiPlayerbot.RandomBotGroupNearby = 0
@@ -814,18 +899,21 @@ AiPlayerbot.OpenGoSpell = 6477
 #
 
 # Additional randombot strategies
-# Strategies added here are applied to all randombots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
-AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
+# Strategies added here are applied to all randombots, in addition (or subtraction) to spec/role-based default strategies.
+# These rules are processed after the defaults.
+# Example: "+threat,-potions"
+AiPlayerbot.RandomBotCombatStrategies = ""
 AiPlayerbot.RandomBotNonCombatStrategies = ""
 
 # Additional altbot strategies
-# Strategies added here are applied to all altbots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
+# Strategies added here are applied to all altbots, in addition (or subtraction) to spec/role-based default strategies.
+# These rules are processed after the defaults.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 
-# Remove "healer dps" strategy on specified maps.
-# Default: 0 (disabled)
-AiPlayerbot.HealerDPSMapRestriction = 0
+# Remove "healer dps" strategy on the maps specified below.
+# Default: 1 (enabled)
+AiPlayerbot.HealerDPSMapRestriction = 1
 
 # List of Map IDs where "healer dps" strategy will be removed if AiPlayerbot.HealerDPSMapRestriction is enabled
 # Default: (Dungeon and Raid maps) "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
@@ -902,7 +990,7 @@ AiPlayerbot.ZoneBracket.3433 = 10,22
 AiPlayerbot.ZoneBracket.3525 = 10,21
 
 # Classic WoW - High-level zones:
-# Deadwind Pass          (Zone ID:   10    Default Min,Max: 19,33)
+# Duskwood               (Zone ID:   10    Default Min,Max: 19,33)
 # Wetlands               (Zone ID:   11    Default Min,Max: 21,30)
 # Redridge Mountains     (Zone ID:   44    Default Min,Max: 16,28)
 # Hillsbrad Foothills    (Zone ID:  267    Default Min,Max: 20,34)
@@ -1009,12 +1097,27 @@ AiPlayerbot.ZoneBracket.4197 = 79,80
 #
 #
 
-# Maps where bots can be teleported to
+# Map IDs where bots can be teleported to
+# Defaults: 0 = Eastern Kingdoms, 1 = Kalimdor, 530 = Outland, 571 = Northrend
 AiPlayerbot.RandomBotMaps = 0,1,530,571
 
 # Probabilty bots teleport to banker (city)
 # Default: 0.25
 AiPlayerbot.ProbTeleToBankers = 0.25
+
+# Control probability weights for bots teleporting to Capital city bankers
+# Sum of weights need not be 100. Set to 0 to disable teleporting to the city.
+AiPlayerbot.EnableWeightTeleToCityBankers = 1
+AiPlayerbot.TeleToStormwindWeight = 2
+AiPlayerbot.TeleToIronforgeWeight = 1
+AiPlayerbot.TeleToDarnassusWeight = 1
+AiPlayerbot.TeleToExodarWeight = 1
+AiPlayerbot.TeleToOrgrimmarWeight = 2
+AiPlayerbot.TeleToUndercityWeight = 1
+AiPlayerbot.TeleToThunderBluffWeight = 1
+AiPlayerbot.TeleToSilvermoonCityWeight = 1
+AiPlayerbot.TeleToShattrathCityWeight = 1
+AiPlayerbot.TeleToDalaranWeight = 1
 
 # How far randombots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
@@ -1120,7 +1223,7 @@ AiPlayerbot.DeleteRandomBotArenaTeams = 0
 AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
 
 # PvP Restricted Areas (bots don't pvp)
-AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080"
+AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973"
 
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 AiPlayerbot.FastReactInBG = 1
@@ -1131,24 +1234,46 @@ AiPlayerbot.FastReactInBG = 1
 ####################################################################################################
 
 ####################################################################################################
-# INTERVALS
+# RANDOM BOT TIMING AND BEHAVIOR
 #
 #
 
-# All in seconds
+# How often (in seconds) the random bot manager runs its main update loop
+# Default: 20
 AiPlayerbot.RandomBotUpdateInterval = 20
+
+# Minimum and maximum seconds before the manager re-evaluates and adjusts total random bot count
+# Defaults: 1800 (min), 7200 (max)
 AiPlayerbot.RandomBotCountChangeMinInterval = 1800
 AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
+
+# Minimum and maximum seconds a random bot will stay online before logging out
+# Defaults: 600 (min), 28800 (max)
 AiPlayerbot.MinRandomBotInWorldTime = 600
 AiPlayerbot.MaxRandomBotInWorldTime = 28800
+
+# Minimum and maximum seconds before a bot is eligible for re-randomization (gear, class, talents, etc.)
+# Defaults: 7200 (min), 1209600 (max)
 AiPlayerbot.MinRandomBotRandomizeTime = 7200
 AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
+
+# Number of bots processed (login, logout, update) per manager update cycle
+# Default: 60
 AiPlayerbot.RandomBotsPerInterval = 60
+
+# Minimum and maximum seconds after death before a bot revives
+# Defaults: 60 (min), 300 (max)
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
+
+# Minimum and maximum seconds between bot teleports to new areas or zones
+# Defaults: 3600 (min), 18000 (max)
 AiPlayerbot.MinRandomBotTeleportInterval = 3600
 AiPlayerbot.MaxRandomBotTeleportInterval = 18000
-AiPlayerbot.PermanantlyInWorldTime = 31104000
+
+# Number of seconds bots flagged as permanent stay in the world (31,104,000 ≈ 1 year)
+# Default: 31104000
+AiPlayerbot.PermanentlyInWorldTime = 31104000
 
 #
 #
@@ -1368,7 +1493,7 @@ AiPlayerbot.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
 ####################################################################################################
 
 ####################################################################################################
-# DEATHKNIGHT
+# DEATH KNIGHT
 #
 #
 
@@ -1499,7 +1624,7 @@ AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530135201051
 AiPlayerbot.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
 AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
 AiPlayerbot.PremadeSpecName.9.2 = destro pve
-AiPlayerbot.PremadeSpecGlyph.9.2 = 45785,43390,50077,43394,43393,42454
+AiPlayerbot.PremadeSpecGlyph.9.2 = 45785,43390,42454,43394,43393,45785
 AiPlayerbot.PremadeSpecLink.9.2.60 = --05203215200231051305031151
 AiPlayerbot.PremadeSpecLink.9.2.80 = 23-0302-05203215220331051335231351
 AiPlayerbot.PremadeSpecName.9.3 = affli pvp
@@ -1572,10 +1697,10 @@ AiPlayerbot.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 #
 #
 
-# Applies a permanent buff to all bots simulating effects of spells, flasks, food, runes, etc.
+# Applies automatically refreshing buffs to bots simulating effects of spells, flasks, food, runes, etc.
 # Requires sending the command "nc +worldbuff" in chat to a bot (or a group of bots) to enable
 # Each entry in the matrix should be formatted as follows: Entry:FactionID,ClassID,SpecID,MinimumLevel,MaximumLevel:SpellID1,SpellID2,etc.;
-# Use 0 for any field to make it agnostic (e.g., 0 for FactionID means the entry will apply buffs to either faction)
+# FactionID may be set to 0 for the entry to apply buffs to bots of either faction
 # The default entries create a cross-faction list of level 80 buffs for each implemented pve spec from the "Premade Specs" section
 # The default entries may be deleted or modified, and new custom entries may be added
 
@@ -1691,7 +1816,7 @@ AiPlayerbot.RandomClassSpecIndex.5.2 = 2
 ####################################################################################################
 
 ####################################################################################################
-# DEATHKNIGHT
+# DEATH KNIGHT
 #
 #
 
@@ -1985,13 +2110,15 @@ AiPlayerbot.AllowedLogFiles = ""
 ####################################################################################################
 # A list of gameObject GUID's that are not allowed for bots to interact with.
 #
-AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,17155,2857,179490
+AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329,2560
 #
 # List of GUID's:
 # QuestItems:
-# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope
+# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope, 123329 = Baelogs Chest, 2560 = Half-Buried Bottle
 # Chests:
-# Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490
+# Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490, Witch Doctor's Chest = 141596, Relic Coffer = 160836, Dark Coffer = 160845, Fengus's Chest = 179516, Supply Crate = 176224/181085, Malor's Strongbox = 176112
+# Other:
+# Shallow Grave (Zul'Farrak) = 128308/128403, Grim Guzzler Boar (Blackrock Depths) = 165739, Dark Iron Ale Mug (Blackrock Depths) = 165738, Father Flame (Blackrock Spire) = 175245, Unforged Runic Breastplate (Blackrock Spire) = 175970, Blacksmithing Plans (Stratholme) = 176325/176327
 # Feel free to edit and help to complete.
 #
 ####################################################################################################
