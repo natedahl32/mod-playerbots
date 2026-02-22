@@ -89,35 +89,3 @@ bool CastSpiritWalkAction::Execute(Event event)
     }
     return false;
 }
-
-// Set Strategy Assigned Totems (Actions) - First, it checks
-// the highest-rank spell the bot knows for each totem type,
-// then adds it to the Call of the Elements bar.
-bool SetTotemAction::Execute(Event event)
-{
-    uint32 totemSpell = 0;
-    for (size_t i = 0; i < totemSpellIdsCount; ++i)
-    {
-        if (bot->HasSpell(totemSpellIds[i]))
-        {
-            totemSpell = totemSpellIds[i];
-            break;
-        }
-    }
-
-    if (!totemSpell)
-    {
-        return false;
-    }
-
-    if (const ActionButton* button = bot->GetActionButton(actionButtonId))
-    {
-        if (button->GetType() == ACTION_BUTTON_SPELL && button->GetAction() == totemSpell)
-        {
-            return false;
-        }
-    }
-
-    bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
-    return true;
-}
